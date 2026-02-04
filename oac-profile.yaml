@@ -1,0 +1,64 @@
+device:
+  vendor: ekinops
+  model: PM_OAC20
+
+sysobjectid:
+  - 1.3.6.1.4.1.20044.114.*
+
+metrics:
+  # Module temperature (scalar). Value needs divide by 256 to get °C.
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.1.80.0
+      name: ekinops.oac.module.temperature_raw
+      type: gauge
+      scale_factor: 0.00390625
+      description: "OAC module raw temperature (divide by 256 to get °C)"
+
+  # Module status example
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.1.82.0
+      name: ekinops.oac.module.some_status
+      type: gauge
+
+  # Line-side EDFA (scalars)
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.3.49.0
+      name: ekinops.oac.line.tx_power_raw
+      type: gauge
+      scale_factor: 0.005
+
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.3.50.0
+      name: ekinops.oac.line.rx_power_raw
+      type: gauge
+      scale_factor: 0.005
+
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.3.54.0
+      name: ekinops.oac.line.corrected_gain_raw
+      type: gauge
+      scale_factor: 0.005
+
+  # Client-side EDFA scalars
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.2.33.0
+      name: ekinops.oac.client.tx_power_raw
+      type: gauge
+      scale_factor: 0.005
+
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.3.2.34.0
+      name: ekinops.oac.client.rx_power_raw
+      type: gauge
+      scale_factor: 0.005
+
+  # Example high-signal alarms (scalars)
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.2.1.3.0.9.0
+      name: ekinops.oac.alarm.module_failure
+      type: gauge
+
+  - symbol:
+      OID: 1.3.6.1.4.1.20044.114.2.3.3.43.4.0
+      name: ekinops.oac.alarm.line_los
+      type: gauge
