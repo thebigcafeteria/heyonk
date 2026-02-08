@@ -44,32 +44,13 @@ TEMP_CALC_MLT = 64.0
 HUM_CALC_MLT = 512.0
 
 
-def _read_word(bus: SMBus, address: int, reg: int, retries: int = 3) -> int:
-    last_error: Exception | None = None
-    for _ in range(retries):
-        try:
-            data = bus.read_i2c_block_data(address, reg, 2)
-            return (data[1] << 8) | data[0]
-        except OSError as exc:
-            last_error = exc
-            time.sleep(0.05)
-    raise RuntimeError(
-        "I2C read timeout. Verify wiring, bus number, and address."
-    ) from last_error
+def _read_word(bus: SMBus, address: int, reg: int) -> int:
+    data = bus.read_i2c_block_data(address, reg, 2)
+    return (data[1] << 8) | data[0]
 
 
-def _write_word(bus: SMBus, address: int, reg: int, value: int, retries: int = 3) -> None:
-    last_error: Exception | None = None
-    for _ in range(retries):
-        try:
-            bus.write_i2c_block_data(address, reg, [value & 0xFF, (value >> 8) & 0xFF])
-            return
-        except OSError as exc:
-            last_error = exc
-            time.sleep(0.05)
-    raise RuntimeError(
-        "I2C write timeout. Verify wiring, bus number, and address."
-    ) from last_error
+def _write_word(bus: SMBus, address: int, reg: int, value: int) -> None:
+    bus.write_i2c_block_data(address, reg, [value & 0xFF, (value >> 8) & 0xFF])
 
 
 def airquality11_set_op_mode(bus: SMBus, address: int, op_mode: int) -> None:
@@ -136,12 +117,10 @@ def airquality11_display_aqi_uba(aqi_uba: int) -> None:
     print("- - - - - - - - - - - - - - -")
 
 
-def application_init(bus: SMBus, address: int, skip_id_check: bool) -> None:
+def application_init(bus: SMBus, address: int) -> None:
     part_id = _read_word(bus, address, REG_PART_ID)
-    if not skip_id_check and part_id != PART_ID_ENS161:
-        raise RuntimeError(
-            f"Unexpected PART_ID 0x{part_id:04X}. Use --skip-id-check to bypass."
-        )
+    if part_id != PART_ID_ENS161:
+        raise RuntimeError(f"Unexpected PART_ID 0x{part_id:04X}")
 
     airquality11_set_op_mode(bus, address, OPMODE_RESET)
     time.sleep(0.1)
@@ -195,20 +174,10 @@ def main() -> None:
         default=1.0,
         help="Delay between measurement cycles in seconds (default: 1.0)",
     )
-    parser.add_argument(
-        "--skip-id-check",
-        action="store_true",
-        help="Skip PART_ID verification (useful if address probing is flaky)",
-    )
     args = parser.parse_args()
 
     with SMBus(args.bus) as bus:
-        try:
-            application_init(bus, args.address, args.skip_id_check)
-        except RuntimeError as exc:
-            print(str(exc))
-            print("Try: --bus 1 --address 0x53 (or 0x52), and check I2C wiring.")
-            return
+        application_init(bus, args.address)
         while True:
             application_task(bus, args.address, args.interval)
 
