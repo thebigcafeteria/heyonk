@@ -1,0 +1,22 @@
+{
+    "display_name": "Air Quality 11 Click",
+    "name": "mikroe.click.airquality11",
+    "type": "click",
+    "version": "2.2.0",
+    "pid": "MIKROE-6063",
+    "package_changed": true,
+    "contents": {
+        "examples": [
+            {
+                "path": "Air Quality 11 Click/examples/example"
+            }
+        ],
+        "libraries": [
+            {
+                "alias": "Click.AirQuality11",
+                "subdir_name": "lib_airquality11",
+                "path": "Air Quality 11 Click/data/lib_airquality11"
+            }
+        ]
+    }
+}
